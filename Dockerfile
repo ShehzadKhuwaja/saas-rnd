@@ -1,3 +1,4 @@
+
 # Set the python version as a build-time argument
 # with Python 3.12 as the default
 ARG PYTHON_VERSION=3.12-slim-bullseye
@@ -43,10 +44,18 @@ COPY ./src /code
 # Install the Python project requirements
 RUN pip install -r /tmp/requirements.txt
 
+ARG DJANGO_SECRET_KEY
+ENV DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+
+ARG DJANGO_DEBUG=0
+ENV DJANGO_DEBUG=${DJANGO_DEBUG}
+
 # database isn't available during build
 # run any other commands that do not need the database
 # such as:
-# RUN python manage.py collectstatic --noinput
+RUN python manage.py vendor_pull
+RUN python manage.py collectstatic --noinput
+# whitenoise -> s3
 
 # set the Django default project name
 ARG PROJ_NAME="cfehome"
